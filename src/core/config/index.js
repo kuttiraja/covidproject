@@ -3,7 +3,7 @@ require('dotenv').config();
 module.exports = {
     APP_NAME: process.env.APP_NAME || 'covidscreening',
     APP_HOST: process.env.APP_HOST || 'localhost',
-    APP_PORT: process.env.APP_PORT || 8080,
+    APP_PORT: process.env.PORT || 8080,
     DB_HOST: process.env.DB_HOST,
     DB_PORT: process.env.DB_PORT,
     DB_SCHEMA: process.env.DB_SCHEMA,
