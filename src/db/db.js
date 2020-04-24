@@ -10,11 +10,12 @@ const mongooseOptions = {
 }
 let DB_URI = null;
 
-if (config.DB_HOST === 'localhost')
-    DB_URI = `mongodb://${config.DB_HOST}:${config.DB_PORT}/${config.DB_SCHEMA}`
-else
-    DB_URI = `mongodb://${config.DB_USER}:${config.DB_PASS}@${config.DB_HOST}:${config.DB_PORT}/${config.DB_SCHEMA}`
+// if (config.DB_HOST === 'localhost')
+//     DB_URI = `mongodb://${config.DB_HOST}:${config.DB_PORT}/${config.DB_SCHEMA}`
+// else
+//     DB_URI = `mongodb://${config.DB_USER}:${config.DB_PASS}@${config.DB_HOST}:${config.DB_PORT}/${config.DB_SCHEMA}`
 
+DB_URI = 'mongodb+srv://admin:mypass1@cluster0-gzqqi.azure.mongodb.net/test?retryWrites=true&w=majority'
 async function connect() {
     await mongoose.connect(DB_URI, mongooseOptions)
 }
