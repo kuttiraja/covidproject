@@ -1,3 +1,4 @@
+const User = require('../db/models/employee')
 
 async function covidApiHome(req, res, next) {
     res.status(200).send("Hello World")
