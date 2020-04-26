@@ -12,35 +12,31 @@ async function covidApiHome(req, res, next) {
     //     links: [{}]
     // }
     let response = {}
-    let nodes = [] 
+    var nodes = [] 
     let links = []
 
     try { 
         nodes = await Node.retrieveAllNodeEmployees();
 
-        nodes.map(item => { return { ...item, color:"red"}});
-        //     e.color = "red"
-        //     return e;
-        // })
-        logger.info(nodes[0])
-        // logger.info(nodes instanceof Array)
-        // x = nodes.splice(1,1)
-        // console.log(Object.isFrozen(x))
-        // for (let index = 0; index < x.length; index++) {
-        //   x[index]['color'] = "red"
-         
-        // }
-        // console.log(x)
-        // element.color = "red";
-        
-        // nodes.forEach( function(element) {
-        //   // console.log(element);
-        //   element.abcd = "red"
-        //   console.log(element);
-        // });
-        // console.log(nodes[0]);
-        // logger.info(nodes[0])
-        logger.info("===========================================")
+        nodes.forEach(node => {
+          switch(node.covidImpactIndicator) {
+            case "R":
+              node.color = "red"
+              break;
+            case "Q":
+              node.color = "orange"
+              break;
+            case "M":
+              node.color = "yellow"
+              break;
+            case "N":
+              node.color = "green"
+              break;
+            default:
+              node.color = "black"
+              break;
+          }
+        })
     }
     catch (err) {
         logger.info("retrieveAllNodeEmployees failed",err)

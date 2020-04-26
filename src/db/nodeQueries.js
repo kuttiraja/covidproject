@@ -16,7 +16,7 @@ const logger = require('../core').logger
 async function retrieveAllNodeEmployees() {
     let NodeEmployees = [];
     try {
-        NodeEmployees = NodeEmployee.find({})
+        NodeEmployees = NodeEmployee.find({}).lean()
     }
     catch (err) {
         logger.info("Fetch Node Failed");
