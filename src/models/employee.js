@@ -8,6 +8,8 @@ const employeeSchema = new mongoose.Schema({
     usedPublicTransport: Types.Boolean,
     havingCovid: Types.Boolean,
     havingFever: Types.Boolean,
+    covidIndicator: Types.String,
+    createTs : Types.Date,
     securityNotified: Types.Boolean,
     securityNotification: Types.String
 })
