@@ -3,17 +3,17 @@ const employee = require('../db').employeeQueries
 const Node = require('../db').NodeQueries
 const Links = require('../db').LinksQueries
 const logger = require('../core').logger
+const Graph = require('../graph').Graph
 
 async function covidApiHome(req, res, next) {
-    //Fetch details from Links/Nodes and construct the graph structure
-    // send to UI with below structures
-    // // {
-    //     nodes: [{}],
-    //     links: [{}]
-    // }
     let response = {}
     var nodes = [] 
     let links = []
+
+    // console.log(graph)
+    
+
+
 
     try { 
         nodes = await Node.retrieveAllNodeEmployees();
@@ -69,19 +69,13 @@ async function covidAssistant(req, res, next) {
           havingFever: parameters.havingFever === "false" ? false : true,
           employeeId: parameters.employeeId,
           employeeName: parameters.employeeName,
-          covidIndicator: "N"
+          // covidIndicator: "N"
         }
+        // compute covid indicator for this employee and update in node
+        // update the links DB as well
+        await computeEmployeeCovidIndicator(personResponse);
+
         await employee.insertOrUpdateEmployeeAssistant(personResponse)
-        // let assistantDetails = new employeeModel(personResponse)
-
-        // try {
-
-        //     await assistantDetails.save();
-        //     logger.info("User Details saved")
-        // }
-        // catch(err) {
-        //     logger.error("User details save error", err)
-        // }
     }
     responseObject = {
         fulfillmentMessages: [
@@ -95,6 +89,53 @@ async function covidAssistant(req, res, next) {
         ]
       }
     res.status(200).send(responseObject)
+}
+
+async function computeEmployeeCovidIndicator(employeeAssistantInput) {
+
+  let covidRank = computeCovidSeverity(employeeAssistantInput);
+  switch(covidRank) {
+    case 0 :
+      employeePass = "green"  // No Action
+      break;
+    case 1:
+    case 2:
+      employeePass = "yellow"  // Update Links to Monitor, employee Indicator to "M"
+      break;
+    case 3:
+    case 4:
+        employeePass = "red"  // Update Employee Indicator to "R",Update Links to Quarantine
+        break;
+    default:
+        employeePass = "green"
+        break;
+  }
+  //Update Node
+  // updatedNode = await Node.
+  if(employeePass != "green") {
+    let empArray = []
+    let graph = await Graph.loadLinksFromDBToGraph();
+    Graph.updateEmployeeNodeCovidIndicators(employeeAssistantInput.employeeId, employeePass)
+    
+    empArray.push(employeeAssistantInput.employeeId)
+    await Graph.updateEmployeeLinksCovidIndicators(graph, empArray,employeePass);
+  }
+  
+
+}
+
+function computeCovidSeverity(input) {
+  let count = 0;
+  if(input.havingFever === true)
+    count +=1;
+  if (input.havingCovid === true)
+    count +=1;
+  if (input.usedPublicTransport === true)
+    count +=1;
+  if (input.travelOutside === true)
+    count +=1; 
+
+  return count;
 }
 
 module.exports = {

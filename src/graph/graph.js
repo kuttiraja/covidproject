@@ -1,36 +1,32 @@
 var graphDataStructure = require("graph-data-structure") 
 const employee = require('../db').employeeQueries
+const Links = require('../db').LinksQueries
+const Node = require('../db').NodeQueries
 
-var graph = graphDataStructure();
+// var graph = graphDataStructure();
 
-// graph.addNode("a");
-// graph.addNode("b");
-// graph.addNode("c");
-// graph.addNode("d");
-// graph.addNode("e");
-// graph.addNode("f");
-// graph.addEdge("a", "b");
-// graph.addEdge("b", "c");
-// graph.addEdge("b", "d");
-// graph.addEdge("b", "e");
-// graph.addEdge("d", "f");
-
-// graph.topologicalSort();.dep
-// graph.nodes();
-// graph.depthFirstSearch(["b"], false)
 
 async function loadLinksFromDBToGraph() {
+
+    var graph = graphDataStructure();
+    let links = await Links.retrieveAllLinkEmployees();
+    links.forEach(link => {
+        graph.addEdge(link.source , link.target);
+    })
+    return graph;
     //Fetch records from Links DB
     //Update graph with nodes and edges(pre-Load while start of the app)
 }
 
-async function updateNodesCovidIndicators(employeeId, pass) {
+async function updateEmployeeLinksCovidIndicators(graph, employeeId, pass) {
     //Find the links for the employeeId
     // Update the linked employee's Indicators as below
     //if employId is red pass, update links with "Q"
     //if employId is yellow pass, update links with "M"(if no indicator, if Q - No update).
     //if employId is green pass, no action
+    // console.log(graph)
     let updateLinks = graph.depthFirstSearch(employeeId, false);
+    console.log(updateLinks)
     let linkedemployees = []
     updateLinks.forEach(element => {
         if(pass === 'red') {
@@ -46,13 +42,34 @@ async function updateNodesCovidIndicators(employeeId, pass) {
                 covidIndicator : "M"
             })
         }
-        employee.updateEmployeeCovidIndicators(linkedemployees);
     });
+    await Node.updateEmployeeLinksCovidIndicators(linkedemployees);
+}
+
+async function updateEmployeeNodeCovidIndicators(employeeId, pass) {
+    let covidImpactIndicator = "N";
+    switch(pass) {
+        case "red":
+            covidImpactIndicator = "R"
+            break;
+        case "orange":
+            covidImpactIndicator = "Q"
+            break;
+        case "yellow":
+            covidImpactIndicator = "M"
+            break;
+        default:
+            covidImpactIndicator = "N"
+            break;
+    }
+    await Node.updateEmployeeNodeCovidIndicators(employeeId, covidImpactIndicator)
+
 }
 
 
 
 module.exports = {
     loadLinksFromDBToGraph,
-    updateNodesCovidIndicators
+    updateEmployeeLinksCovidIndicators,
+    updateEmployeeNodeCovidIndicators
 }
