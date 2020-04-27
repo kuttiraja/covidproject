@@ -4,36 +4,33 @@ const Node = require('../db').NodeQueries
 const Links = require('../db').LinksQueries
 const logger = require('../core').logger
 const Graph = require('../graph').Graph
+const AppConfig = require('../core').config
 
 async function covidApiHome(req, res, next) {
     let response = {}
     var nodes = [] 
     let links = []
 
-    // console.log(graph)
-    
-
-
-
     try { 
         nodes = await Node.retrieveAllNodeEmployees();
 
         nodes.forEach(node => {
           switch(node.covidImpactIndicator) {
-            case "R":
-              node.color = "red"
+            case AppConfig.IMPACTED_COVID_INDICATOR: // RED - I
+              node.color = AppConfig.IMPACTED_COVID_COLOR
               break;
-            case "Q":
-              node.color = "orange"
+            case AppConfig.QUARANTINE_COVID_INDICATOR:  // Light Red - Q
+              node.color = AppConfig.QUARANTINE_COVID_COLOR
               break;
-            case "M":
-              node.color = "yellow"
+            case AppConfig.MONITOR_COVID_INDICATOR:  // YELLOW - M
+              node.color = AppConfig.MONITOR_COVID_COLOR
               break;
-            case "N":
-              node.color = "green"
+            case AppConfig.CONTACTTRACE_COVID_INDICATOR:   // Light YELLOW - C
+              node.color = AppConfig.CONTACTTRACE_COVID_COLOR
               break;
+            case AppConfig.NOIMPACT_COVID_INDICATOR:  // GREEN - N
             default:
-              node.color = "black"
+              node.color = AppConfig.NOIMPACT_COVID_COLOR
               break;
           }
         })
@@ -93,38 +90,46 @@ async function covidAssistant(req, res, next) {
 
 async function computeEmployeeCovidIndicator(employeeAssistantInput) {
 
-  let covidRank = computeCovidSeverity(employeeAssistantInput);
-  switch(covidRank) {
-    case 0 :
-      employeePass = "green"  // No Action
-      break;
-    case 1:
-    case 2:
-      employeePass = "yellow"  // Update Links to Monitor, employee Indicator to "M"
-      break;
-    case 3:
-    case 4:
-        employeePass = "red"  // Update Employee Indicator to "R",Update Links to Quarantine
-        break;
-    default:
-        employeePass = "green"
-        break;
+  // let covidRank = computeCovidSeverity(employeeAssistantInput);
+  console.log(employeeAssistantInput)
+  if(employeeAssistantInput.havingCovid === true) {
+    employeePass = AppConfig.IMPACTED_COVID_COLOR
+    employeeIndicator = AppConfig.IMPACTED_COVID_INDICATOR
   }
-  //Update Node
-  // updatedNode = await Node.
-  if(employeePass != "green") {
-    let empArray = []
-    let graph = await Graph.loadLinksFromDBToGraph();
-    Graph.updateEmployeeNodeCovidIndicators(employeeAssistantInput.employeeId, employeePass)
-    
-    empArray.push(employeeAssistantInput.employeeId)
-    await Graph.updateEmployeeLinksCovidIndicators(graph, empArray,employeePass);
+  else if (employeeAssistantInput.havingFever === false &&
+            employeeAssistantInput.travelOutside === false &&
+            employeeAssistantInput.usedPublicTransport === false) {
+              employeePass = AppConfig.NOIMPACT_COVID_COLOR
+              employeeIndicator = AppConfig.NOIMPACT_COVID_INDICATOR
   }
-  
+  else {
+    employeePass = AppConfig.MONITOR_COVID_COLOR
+    employeeIndicator = AppConfig.MONITOR_COVID_INDICATOR
+  }
 
+  console.log(employeeIndicator)
+  if(employeeIndicator !== AppConfig.NOIMPACT_COVID_INDICATOR) {
+    // let empArray = []
+    
+    Graph.updateEmployeeNodeCovidIndicators(employeeAssistantInput.employeeId, employeeIndicator);
+
+    let graph = await Graph.loadLinksFromDBToGraph(); 
+    let empLinkArray = [];
+
+    graph.forEach((link) => {
+      if(link.source === employeeAssistantInput.employeeId) {
+        empLinkArray.push(link.target);
+      }
+    })
+    
+    // empArray.push(employeeAssistantInput.employeeId)
+
+    await Graph.updateEmployeeLinksCovidIndicators(empLinkArray,employeeIndicator);
+  }
 }
 
 function computeCovidSeverity(input) {
+  
   let count = 0;
   if(input.havingFever === true)
     count +=1;

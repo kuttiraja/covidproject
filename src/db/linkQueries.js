@@ -4,7 +4,7 @@ const logger = require('../core').logger
 async function retrieveAllLinkEmployees() {
     let linkEmployees = [];
     try {
-        linkEmployees = LinkEmployees.find({})
+        linkEmployees = LinkEmployees.find({}).lean()
     }
     catch (err) {
         logger.info("Fetch Links Failed");

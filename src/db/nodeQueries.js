@@ -24,32 +24,39 @@ async function retrieveAllNodeEmployees() {
     return NodeEmployees;
 }
 
-async function updateEmployeeLinksCovidIndicators(linkedemployees){
+async function retrievecustomNodeEmployees(empArray) {
+    let NodeEmployees = [];
+    try {
+        NodeEmployees = NodeEmployee.find({ "employeeId" : {$in : empArray}}).lean()
+    }
+    catch(err) {
+        logger.info("Retrieve custom employees failed")
+    }
+    return NodeEmployees
+}
+
+async function updateEmployeeLinksCovidIndicators(linkedemployees, updateCovidImpactIndicator){
     //Get linked employees
-    let empIds = [];
-    console.log(linkedemployees);
+    console.log(updateCovidImpactIndicator);
     if(!Array.isArray(linkedemployees) || !linkedemployees.length) {
         logger.info("There is no link for this employee")
         return 
     }
-    linkedemployees.forEach(element => {
-        empIds.push(element.employeeId)
-    });
     
-    const filter = { "employeeId": {$in : empIds }, "covidImpactIndicator" : "N"}
-    const update = { "covidImpactIndicator" : linkedemployees[0].covidIndicator}
+    const filter = { "employeeId": {$in : linkedemployees }}
+    const update = { "covidImpactIndicator" : updateCovidImpactIndicator}
     try {
         updatedRecords = await NodeEmployee.updateMany(filter, update, {upsert : false, new : true});
         logger.info(updatedRecords)
     }
     catch(err) {
-        logger.info("update Failed")
+        logger.info("update Failed", err)
     }
 }
 
 async function updateEmployeeNodeCovidIndicators(employeeId, covidIndicator) {
     let updatednodes = null 
-    const filter = { $and: [ {"employeeId": employeeId}, {"covidImpactIndicator" : 'N'}]}
+    const filter = { "employeeId": employeeId }
     const update = { "covidImpactIndicator" : covidIndicator}
 
     try {
@@ -58,11 +65,12 @@ async function updateEmployeeNodeCovidIndicators(employeeId, covidIndicator) {
     catch(err) {
         logger.info("update Failed", err)
     }
-    console.log(updatednodes);
+    // console.log(updatednodes);
 }
 
 module.exports = {
     updateEmployeeLinksCovidIndicators,
     retrieveAllNodeEmployees,
-    updateEmployeeNodeCovidIndicators
+    updateEmployeeNodeCovidIndicators,
+    retrievecustomNodeEmployees
 }
