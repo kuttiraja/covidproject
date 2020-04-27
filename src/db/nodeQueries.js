@@ -36,7 +36,7 @@ async function updateEmployeeLinksCovidIndicators(linkedemployees){
         empIds.push(element.employeeId)
     });
     
-    const filter = { "employeeId": {$in : empIds }, "covidImpactIndicator" : null}
+    const filter = { "employeeId": {$in : empIds }, "covidImpactIndicator" : "N"}
     const update = { "covidImpactIndicator" : linkedemployees[0].covidIndicator}
     try {
         updatedRecords = await NodeEmployee.updateMany(filter, update, {upsert : false, new : true});
