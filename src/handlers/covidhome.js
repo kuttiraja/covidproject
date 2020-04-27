@@ -91,7 +91,7 @@ async function covidAssistant(req, res, next) {
 async function computeEmployeeCovidIndicator(employeeAssistantInput) {
 
   // let covidRank = computeCovidSeverity(employeeAssistantInput);
-  console.log(employeeAssistantInput)
+  // console.log(employeeAssistantInput)
   if(employeeAssistantInput.havingCovid === true) {
     employeePass = AppConfig.IMPACTED_COVID_COLOR
     employeeIndicator = AppConfig.IMPACTED_COVID_INDICATOR
@@ -107,7 +107,7 @@ async function computeEmployeeCovidIndicator(employeeAssistantInput) {
     employeeIndicator = AppConfig.MONITOR_COVID_INDICATOR
   }
 
-  console.log(employeeIndicator)
+  // console.log(employeeIndicator)
   if(employeeIndicator !== AppConfig.NOIMPACT_COVID_INDICATOR) {
     // let empArray = []
     
