@@ -5,6 +5,7 @@ const Links = require('../db').LinksQueries
 const logger = require('../core').logger
 const Graph = require('../graph').Graph
 const AppConfig = require('../core').config
+const SendMailNotification = require('../mail').sendemail
 
 async function covidApiHome(req, res, next) {
     let response = {}
@@ -111,7 +112,19 @@ async function computeEmployeeCovidIndicator(employeeAssistantInput) {
   if(employeeIndicator !== AppConfig.NOIMPACT_COVID_INDICATOR) {
     // let empArray = []
     
-    Graph.updateEmployeeNodeCovidIndicators(employeeAssistantInput.employeeId, employeeIndicator);
+    updatedEmployee = await Graph.updateEmployeeNodeCovidIndicators(employeeAssistantInput.employeeId, employeeIndicator);
+    console.log(updatedEmployee)
+    let message = ` Name : ${updatedEmployee.employeeName} <br>
+                    Seat Location: ${updatedEmployee.seatNo} <br>
+                    Pass Information: ${employeePass} - ${employeeIndicator} <br>
+                    Questions Answered: <br>
+                       1. Travelled Outside? : ${employeeAssistantInput.travelOutside} <br>
+                       2. Covid Contact? : ${employeeAssistantInput.havingCovid} <br>
+                       3. Fever? : ${employeeAssistantInput.havingFever} <br> 
+                       4. Public Transport used? : ${employeeAssistantInput.usedPublicTransport} <br>`
+    
+    let subject = `Your Pass Information`
+    await SendMailNotification.sendEmailNotification(subject, message);
 
     let graph = await Graph.loadLinksFromDBToGraph(); 
     let empLinkArray = [];

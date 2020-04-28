@@ -60,12 +60,13 @@ async function updateEmployeeNodeCovidIndicators(employeeId, covidIndicator) {
     const update = { "covidImpactIndicator" : covidIndicator}
 
     try {
-        updatednodes = await NodeEmployee.findOneAndUpdate(filter, update, { upsert : false, new : true});
+        updatednodes = await NodeEmployee.findOneAndUpdate(filter, update, { upsert : false, new : true}).lean();
     }
     catch(err) {
         logger.info("update Failed", err)
     }
     // console.log(updatednodes);
+    return updatednodes
 }
 
 module.exports = {

@@ -1,2 +1,4 @@
 node_modules
 *.log
+sendgrid.env
+sendgrid.env

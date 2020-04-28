@@ -92,7 +92,8 @@ function isEmployeeEligibleForIndicatorUpdate(employee, covidImpactIndicator) {
 async function updateEmployeeNodeCovidIndicators(employeeId, covidImpactIndicator) {
     
     let updatedEmployee = await Node.updateEmployeeNodeCovidIndicators(employeeId, covidImpactIndicator)
-    logger.info("Updated Employee", updatedEmployee);
+    // logger.info("Updated Employee", updatedEmployee);
+    return updatedEmployee;
 
 }
 
