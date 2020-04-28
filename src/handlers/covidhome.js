@@ -53,7 +53,7 @@ async function covidApiHome(req, res, next) {
 async function covidAssistant(req, res, next) {
 
     let action;
-
+    logger.info(req.body)
     action = (req.body.queryResult ===undefined) ? null:
     (req.body.queryResult.action === undefined)? null : req.body.queryResult.action;
 
@@ -76,16 +76,28 @@ async function covidAssistant(req, res, next) {
         await employee.insertOrUpdateEmployeeAssistant(personResponse)
     }
     responseObject = {
-        fulfillmentMessages: [
-          {
-            text: {
-              text: [
-                "Thank you for providing the response. We would notify security for next steps."
-              ]
-            }
+      fulfillmentText : "This is sample text",
+      fulfillmentMessages : [{
+          platform: "ACTIONS_ON_GOOGLE",
+          simpleResponses: {
+            simpleResponses: [{
+              textToSpeech: "Hi! How are you doing?"  
+            }]
           }
-        ]
-      }
+
+      }]
+    }
+
+      //   fulfillmentMessages: [
+      //     {
+      //       text: {
+      //         text: [
+      //           "Thank you for providing the response. We would notify security for next steps."
+      //         ]
+      //       }
+      //     }
+      //   ]
+      // }
     res.status(200).send(responseObject)
 }
 
