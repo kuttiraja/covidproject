@@ -126,7 +126,8 @@ async function computeEmployeeCovidIndicator(employeeAssistantInput) {
     
     updatedEmployee = await Graph.updateEmployeeNodeCovidIndicators(employeeAssistantInput.employeeId, employeeIndicator);
     console.log(updatedEmployee)
-    let message = ` Name : ${updatedEmployee.employeeName} <br>
+    if(updatedEmployee != null) {
+      let message = ` Name : ${updatedEmployee.employeeName} <br>
                     Seat Location: ${updatedEmployee.seatNo} <br>
                     Pass Information: ${employeePass} - ${employeeIndicator} <br>
                     Questions Answered: <br>
@@ -137,7 +138,8 @@ async function computeEmployeeCovidIndicator(employeeAssistantInput) {
     
     let subject = `Your Pass Information`
     await SendMailNotification.sendEmailNotification(subject, message);
-
+    }
+    
     let graph = await Graph.loadLinksFromDBToGraph(); 
     let empLinkArray = [];
 

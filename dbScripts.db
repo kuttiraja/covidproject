@@ -36,6 +36,9 @@ db.getCollection('nodes').save({"employeeId" : 30, "employeeName" : "Srini", "se
 db.getCollection('nodes').save({"employeeId" : 31, "employeeName" : "Alexis", "seatNo": 31, "covidImpactIndicator":"N"})
 
 
+
+
+
 db.getCollection('links').save({"source" : 1, "target":2, "distance" : 0})
 db.getCollection('links').save({"source" : 2, "target":1, "distance" : 0})
 db.getCollection('links').save({"source" : 1, "target":3, "distance" : 0})

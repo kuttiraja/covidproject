@@ -42,7 +42,7 @@ async function updateEmployeeLinksCovidIndicators(empLinkArray, covidImpactIndic
 
     let linkcovidIndicatorUpdate = await findLinkCovidIndicator(covidImpactIndicator);
     
-    console.log(updateLinkEmployees)
+    // console.log(updateLinkEmployees)
     if(Array.isArray(updateLinkEmployees) && updateLinkEmployees.length != 0) {
         await Node.updateEmployeeLinksCovidIndicators(updateLinkEmployees, linkcovidIndicatorUpdate);
     }
@@ -90,9 +90,16 @@ function isEmployeeEligibleForIndicatorUpdate(employee, covidImpactIndicator) {
 }
 
 async function updateEmployeeNodeCovidIndicators(employeeId, covidImpactIndicator) {
-    
-    let updatedEmployee = await Node.updateEmployeeNodeCovidIndicators(employeeId, covidImpactIndicator)
-    logger.info("Updated Employee", updatedEmployee);
+    let updatedEmployee = null
+    let employee = await Node.retrievecustomNodeEmployees(employeeId);
+    if(Array.isArray(employee) && employee.length != 0) {
+        if(isEmployeeEligibleForIndicatorUpdate(employee[0], covidImpactIndicator)) {
+            updatedEmployee = await Node.updateEmployeeNodeCovidIndicators(employeeId, covidImpactIndicator)
+            logger.info("Updated Employee", updatedEmployee);
+        }
+    }
+    // let updatedEmployee = await Node.updateEmployeeNodeCovidIndicators(employeeId, covidImpactIndicator)
+    // logger.info("Updated Employee", updatedEmployee);
     return updatedEmployee;
 
 }

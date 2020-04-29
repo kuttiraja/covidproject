@@ -35,6 +35,17 @@ async function retrievecustomNodeEmployees(empArray) {
     return NodeEmployees
 }
 
+async function findEmployeeByEmployeeId(empId) {
+    let Employee = [];
+    try {
+        Employee  = NodeEmployee.find({"employeeId" : empId}).lean()
+    }
+    catch(err) {
+        logger.info("Employyee Retrieval failed by ID")
+    }
+    return Employee;
+}
+
 async function updateEmployeeLinksCovidIndicators(linkedemployees, updateCovidImpactIndicator){
     //Get linked employees
     console.log(updateCovidImpactIndicator);
