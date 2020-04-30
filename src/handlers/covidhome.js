@@ -53,7 +53,8 @@ async function covidApiHome(req, res, next) {
 async function covidAssistant(req, res, next) {
 
     let action;
-    logger.info(req.body)
+    // logger.info(req.body)
+    let responseObject = {}
     action = (req.body.queryResult ===undefined) ? null:
     (req.body.queryResult.action === undefined)? null : req.body.queryResult.action;
 
@@ -71,56 +72,63 @@ async function covidAssistant(req, res, next) {
         }
         // compute covid indicator for this employee and update in node
         // update the links DB as well
-        await computeEmployeeCovidIndicator(personResponse);
+        let covidEmployeeRank = await computeEmployeeCovidIndicator(personResponse);
 
         await employee.insertOrUpdateEmployeeAssistant(personResponse)
-    }
+    
     responseObject = {
-      fulfillmentText : "This is sample text",
+      fulfillmentText : covidEmployeeRank.responseMessage,
       fulfillmentMessages : [{
           platform: "ACTIONS_ON_GOOGLE",
           simpleResponses: {
             simpleResponses: [{
-              textToSpeech: "Hi! How are you doing?"  
+              textToSpeech: covidEmployeeRank.responseMessage 
             }]
           }
 
       }]
     }
+  }
+  else {
+    responseObject = {
+      fulfillmentText : "Your response is not saved. Please try again",
+      fulfillmentMessages : [{
+          platform: "ACTIONS_ON_GOOGLE",
+          simpleResponses: {
+            simpleResponses: [{
+              textToSpeech: "Your response is not saved. Please try again" 
+            }]
+          }
 
-      //   fulfillmentMessages: [
-      //     {
-      //       text: {
-      //         text: [
-      //           "Thank you for providing the response. We would notify security for next steps."
-      //         ]
-      //       }
-      //     }
-      //   ]
-      // }
-    res.status(200).send(responseObject)
+      }]
+    }
+  }
+  res.status(200).send(responseObject)
 }
 
 async function computeEmployeeCovidIndicator(employeeAssistantInput) {
 
-  // let covidRank = computeCovidSeverity(employeeAssistantInput);
-  // console.log(employeeAssistantInput)
+  let covidRank = {}
   if(employeeAssistantInput.havingCovid === true) {
-    employeePass = AppConfig.IMPACTED_COVID_COLOR
-    employeeIndicator = AppConfig.IMPACTED_COVID_INDICATOR
+    covidRank.employeePass = AppConfig.IMPACTED_COVID_COLOR
+    covidRank.employeeIndicator = AppConfig.IMPACTED_COVID_INDICATOR
+    covidRank.responseMessage = "Thank you. As you have COVID exposure, please follow CDC regulations for self-quarantine"
   }
   else if (employeeAssistantInput.havingFever === false &&
             employeeAssistantInput.travelOutside === false &&
             employeeAssistantInput.usedPublicTransport === false) {
-              employeePass = AppConfig.NOIMPACT_COVID_COLOR
-              employeeIndicator = AppConfig.NOIMPACT_COVID_INDICATOR
+              covidRank.employeePass = AppConfig.NOIMPACT_COVID_COLOR
+              covidRank.employeeIndicator = AppConfig.NOIMPACT_COVID_INDICATOR
+              covidRank.responseMessage = "Thank you. You are all good to go. Show the self-screening message to security for building entry"
   }
   else {
-    employeePass = AppConfig.MONITOR_COVID_COLOR
-    employeeIndicator = AppConfig.MONITOR_COVID_INDICATOR
+    covidRank.employeePass = AppConfig.MONITOR_COVID_COLOR
+    covidRank.employeeIndicator = AppConfig.MONITOR_COVID_INDICATOR
+    covidRank.responseMessage = "Thank you. Please show the self-screening message to security and follow their direction"
   }
 
   // console.log(employeeIndicator)
+  let employeeIndicator = covidRank.employeeIndicator
   if(employeeIndicator !== AppConfig.NOIMPACT_COVID_INDICATOR) {
     // let empArray = []
     
@@ -153,6 +161,8 @@ async function computeEmployeeCovidIndicator(employeeAssistantInput) {
 
     await Graph.updateEmployeeLinksCovidIndicators(empLinkArray,employeeIndicator);
   }
+
+  return covidRank;
 }
 
 function computeCovidSeverity(input) {
