@@ -110,6 +110,7 @@ async function computeEmployeeCovidIndicator(employeeAssistantInput) {
 
   let covidRank = {}
   if(employeeAssistantInput.havingCovid === true) {
+    covidRank.color = "Red"
     covidRank.employeePass = AppConfig.IMPACTED_COVID_COLOR
     covidRank.employeeIndicator = AppConfig.IMPACTED_COVID_INDICATOR
     covidRank.responseMessage = "Thank you. As you have COVID exposure, please follow CDC regulations for self-quarantine"
@@ -117,11 +118,13 @@ async function computeEmployeeCovidIndicator(employeeAssistantInput) {
   else if (employeeAssistantInput.havingFever === false &&
             employeeAssistantInput.travelOutside === false &&
             employeeAssistantInput.usedPublicTransport === false) {
+              covidRank.color = "Yellow"
               covidRank.employeePass = AppConfig.NOIMPACT_COVID_COLOR
               covidRank.employeeIndicator = AppConfig.NOIMPACT_COVID_INDICATOR
               covidRank.responseMessage = "Thank you. You are all good to go. Show the self-screening message to security for building entry"
   }
   else {
+    covidRank.color = "GREEN"
     covidRank.employeePass = AppConfig.MONITOR_COVID_COLOR
     covidRank.employeeIndicator = AppConfig.MONITOR_COVID_INDICATOR
     covidRank.responseMessage = "Thank you. Please show the self-screening message to security and follow their direction"
@@ -134,10 +137,17 @@ async function computeEmployeeCovidIndicator(employeeAssistantInput) {
     
     updatedEmployee = await Graph.updateEmployeeNodeCovidIndicators(employeeAssistantInput.employeeId, employeeIndicator);
     // console.log(updatedEmployee)
+
     if(updatedEmployee != null) {
-      let message = ` Name : ${updatedEmployee.employeeName} <br>
+      let message = ` 
+      Hi ${updatedEmployee.employeeName}, <br></br>
+           ${covidRank.responseMessage} <br
+      <p> Your Details: <br>
+                    Name : ${updatedEmployee.employeeName} <br>
                     Seat Location: ${updatedEmployee.seatNo} <br>
-                    Pass Information: ${covidRank.employeePass} - ${employeeIndicator} <br>
+                    <br>
+                    Pass Color: ${covidRank.color} <br>
+                    <br
                     Questions Answered: <br>
                        1. Travelled Outside? : ${employeeAssistantInput.travelOutside} <br>
                        2. Covid Contact? : ${employeeAssistantInput.havingCovid} <br>

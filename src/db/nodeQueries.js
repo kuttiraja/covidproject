@@ -48,10 +48,11 @@ async function findEmployeeByEmployeeId(empId) {
 
 async function updateEmployeeLinksCovidIndicators(linkedemployees, updateCovidImpactIndicator){
     //Get linked employees
-    console.log(updateCovidImpactIndicator);
-    if(!Array.isArray(linkedemployees) || !linkedemployees.length) {
+    // console.log(updateCovidImpactIndicator);
+    let updatedRecords = null
+    if(!Array.isArray(linkedemployees) || linkedemployees.length === 0) {
         logger.info("There is no link for this employee")
-        return 
+        return updatedRecords
     }
     
     const filter = { "employeeId": {$in : linkedemployees }}
@@ -63,6 +64,8 @@ async function updateEmployeeLinksCovidIndicators(linkedemployees, updateCovidIm
     catch(err) {
         logger.info("update Failed", err)
     }
+
+    return updatedRecords;
 }
 
 async function updateEmployeeNodeCovidIndicators(employeeId, covidIndicator) {

@@ -14,6 +14,7 @@ db.getCollection('nodes').save({"employeeId" : 9, "employeeName" : "Vijayan", "s
 db.getCollection('nodes').save({"employeeId" : 10, "employeeName" : "Raja", "seatNo": 10, "covidImpactIndicator":"N"})
 db.getCollection('nodes').save({"employeeId" : 11, "employeeName" : "Vishak", "seatNo": 11, "covidImpactIndicator":"N"})
 db.getCollection('nodes').save({"employeeId" : 12, "employeeName" : "Priya", "seatNo": 12, "covidImpactIndicator":"N"})
+
 db.getCollection('nodes').save({"employeeId" : 13, "employeeName" : "Roshini", "seatNo": 13, "covidImpactIndicator":"N"})
 db.getCollection('nodes').save({"employeeId" : 14, "employeeName" : "Rama", "seatNo": 14, "covidImpactIndicator":"N"})
 db.getCollection('nodes').save({"employeeId" : 15, "employeeName" : "Rengan", "seatNo": 15, "covidImpactIndicator":"N"})
@@ -22,10 +23,10 @@ db.getCollection('nodes').save({"employeeId" : 17, "employeeName" : "Arjun", "se
 db.getCollection('nodes').save({"employeeId" : 18, "employeeName" : "Babu", "seatNo": 18, "covidImpactIndicator":"N"})
 db.getCollection('nodes').save({"employeeId" : 19, "employeeName" : "John", "seatNo": 19, "covidImpactIndicator":"N"})
 db.getCollection('nodes').save({"employeeId" : 20, "employeeName" : "Anna", "seatNo": 20, "covidImpactIndicator":"N"})
-
 db.getCollection('nodes').save({"employeeId" : 21, "employeeName" : "Joe", "seatNo": 21, "covidImpactIndicator":"N"})
 db.getCollection('nodes').save({"employeeId" : 22, "employeeName" : "Sara", "seatNo": 22, "covidImpactIndicator":"N"})
 db.getCollection('nodes').save({"employeeId" : 23, "employeeName" : "Kathir", "seatNo": 23, "covidImpactIndicator":"N"})
+
 db.getCollection('nodes').save({"employeeId" : 24, "employeeName" : "Tim", "seatNo": 24, "covidImpactIndicator":"N"})
 db.getCollection('nodes').save({"employeeId" : 25, "employeeName" : "Francis", "seatNo": 25, "covidImpactIndicator":"N"})
 db.getCollection('nodes').save({"employeeId" : 26, "employeeName" : "Mark", "seatNo": 26, "covidImpactIndicator":"N"})

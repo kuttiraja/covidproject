@@ -34,18 +34,23 @@ async function updateEmployeeLinksCovidIndicators(empLinkArray, covidImpactIndic
     let linkedEmployees = await Node.retrievecustomNodeEmployees(empLinkArray);
     // console.log(linkedEmployees)
 
-    linkedEmployees.forEach(employee => {
-        if(isEmployeeEligibleForIndicatorUpdate(employee, covidImpactIndicator) === true){
-            updateLinkEmployees.push(employee.employeeId);
-        }
-    })
+    if(Array.isArray(linkedEmployees) && linkedEmployees.length != 0) {
 
-    let linkcovidIndicatorUpdate = await findLinkCovidIndicator(covidImpactIndicator);
-    
-    // console.log(updateLinkEmployees)
-    if(Array.isArray(updateLinkEmployees) && updateLinkEmployees.length != 0) {
-        await Node.updateEmployeeLinksCovidIndicators(updateLinkEmployees, linkcovidIndicatorUpdate);
+        linkedEmployees.forEach(employee => {
+            if(isEmployeeEligibleForIndicatorUpdate(employee, covidImpactIndicator) === true){
+                updateLinkEmployees.push(employee.employeeId);
+            }
+        })
+
+        let linkcovidIndicatorUpdate = await findLinkCovidIndicator(covidImpactIndicator);
+        
+        // console.log(updateLinkEmployees)
+        if(Array.isArray(updateLinkEmployees) && updateLinkEmployees.length != 0) {
+            updatedRecords =  await Node.updateEmployeeLinksCovidIndicators(updateLinkEmployees, linkcovidIndicatorUpdate);
+            logger.info("Links Updated", JSON.stringify(updatedRecords))
+        }
     }
+
 }
 
 async function findLinkCovidIndicator(covidImpactIndicator) {
@@ -66,7 +71,8 @@ function isEmployeeEligibleForIndicatorUpdate(employee, covidImpactIndicator) {
         case "I":
             if(employee.covidImpactIndicator ===  AppConfig.NOIMPACT_COVID_INDICATOR ||
                 employee.covidImpactIndicator === AppConfig.CONTACTTRACE_COVID_INDICATOR ||
-                employee.covidImpactIndicator === AppConfig.MONITOR_COVID_INDICATOR) {
+                employee.covidImpactIndicator === AppConfig.MONITOR_COVID_INDICATOR ||
+                employee.covidImpactIndicator === AppConfig.QUARANTINE_COVID_INDICATOR) {
                     return true;
                 }
             else {
